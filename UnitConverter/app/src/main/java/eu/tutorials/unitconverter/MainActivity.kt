@@ -27,15 +27,26 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import eu.tutorials.unitconverter.ui.theme.UnitConverterTheme
+import kotlin.math.roundToInt
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,55 +67,187 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun UnitConverter() {
+    var inputValue by remember { mutableStateOf("") }
+    var outputValue by remember { mutableStateOf("") }
+    var inputUnit by remember { mutableStateOf("Meters") }
+    var outputUnit by remember { mutableStateOf("Meters") }
+    var iExpanded by remember { mutableStateOf(false) }
+    var oExpanded by remember { mutableStateOf(false) }
+    val conversionFactor = remember { mutableDoubleStateOf(1.00) }
+    val oConversionFactor = remember { mutableDoubleStateOf(1.00) }
+
+    val customHeadlineTextStyle = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontSize = 32.sp,
+        color = Color.Blue,
+        fontWeight = SemiBold
+    )
+    val customResultTextStyle = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontSize = 24.sp,
+        color = Color.Black,
+        fontWeight = SemiBold
+    )
+
+    fun convertUnits() {
+        val inputValueDouble = inputValue.toDoubleOrNull() ?: 0.0
+        val result =
+            (inputValueDouble * conversionFactor.doubleValue * 100 / oConversionFactor.doubleValue).roundToInt() / 100.0
+        outputValue = result.toString()
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Here all the UI elements will be stacked below each other
-        Text("Unit Converter")
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(16.dp))
-        OutlinedTextField(value = "", onValueChange = {})
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(16.dp))
+        Text(
+            "Unit Converter",
+            style = customHeadlineTextStyle
+        )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(16.dp)
+        )
+        OutlinedTextField(
+            value = inputValue,
+            onValueChange = {
+                inputValue = it
+                convertUnits()
+            },
+            label = { Text(text = "Enter Value") }
+        )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+        )
 
         Row {
+            //Input Box
             Box {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Select")
+                //Input Button
+                Button(onClick = { iExpanded = true }) {
+                    Text(text = inputUnit)
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "Arrow Down")
                 }
-                DropdownMenu(expanded = true, onDismissRequest = { /*TODO*/ }) {
-                    DropdownMenuItem(text = { Text("Centimeters") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Meters") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Feet") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Inches") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Millimeters") }, onClick = { /*TODO*/ })
+                DropdownMenu(expanded = iExpanded, onDismissRequest = { iExpanded = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Centimeters") },
+                        onClick = {
+                            iExpanded = false
+                            inputUnit = "Centimeters"
+                            conversionFactor.doubleValue = 0.01
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Meters") },
+                        onClick = {
+                            iExpanded = false
+                            inputUnit = "Meters"
+                            conversionFactor.doubleValue = 1.0
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Feet") },
+                        onClick = {
+                            iExpanded = false
+                            inputUnit = "Feet"
+                            conversionFactor.doubleValue = 0.3048
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Inches") },
+                        onClick = {
+                            iExpanded = false
+                            inputUnit = "Inches"
+                            conversionFactor.doubleValue = 0.0254
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Millimeters") },
+                        onClick = {
+                            iExpanded = false
+                            inputUnit = "Millimeters"
+                            conversionFactor.doubleValue = 0.001
+                            convertUnits()
+                        }
+                    )
                 }
 
             }
             Spacer(modifier = Modifier.width(16.dp))
+            //Output Box
             Box {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Select")
+                //Output Button
+                Button(onClick = { oExpanded = true }) {
+                    Text(text = outputUnit)
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "Arrow Down")
                 }
-                DropdownMenu(expanded = true, onDismissRequest = { /*TODO*/ }) {
-                    DropdownMenuItem(text = { Text("Centimeters") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Meters") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Feet") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Inches") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = { Text("Millimeters") }, onClick = { /*TODO*/ })
+                DropdownMenu(expanded = oExpanded, onDismissRequest = { oExpanded = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Centimeters") },
+                        onClick = {
+                            oExpanded = false
+                            outputUnit = "Centimeters"
+                            oConversionFactor.doubleValue = 0.01
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Meters") },
+                        onClick = {
+                            oExpanded = false
+                            outputUnit = "Meters"
+                            oConversionFactor.doubleValue = 1.0
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Feet") },
+                        onClick = {
+                            oExpanded = false
+                            outputUnit = "Feet"
+                            oConversionFactor.doubleValue = 0.3048
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Inches") },
+                        onClick = {
+                            oExpanded = false
+                            outputUnit = "Inches"
+                            oConversionFactor.doubleValue = 0.0254
+                            convertUnits()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Millimeters") },
+                        onClick = {
+                            iExpanded = false
+                            outputUnit = "Millimeters"
+                            oConversionFactor.doubleValue = 0.001
+                            convertUnits()
+                        }
+                    )
                 }
             }
         }
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(16.dp))
-        Text(text = "Result:")
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(16.dp)
+        )
+        Text(
+            text = "Result: $outputValue $outputUnit",
+            style = customResultTextStyle
+        )
     }
 }
 
