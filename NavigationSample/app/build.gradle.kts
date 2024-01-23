@@ -1,15 +1,14 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("kotlin-parcelize")
 }
 
 android {
-    namespace = "eu.tutorials.myrecipeapp"
+    namespace = "eu.tutorials.navigationsample"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "eu.tutorials.myrecipeapp"
+        applicationId = "eu.tutorials.navigationsample"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -51,20 +50,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.navigation:navigation-compose:2.7.4")
-
-    //Compose ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-
-    //Network calls
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-
-    //Json to Kotlin object mapping
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    //Image loading
-    implementation("io.coil-kt:coil-compose:2.4.0")
-
+    val nav_version = "2.7.4"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
