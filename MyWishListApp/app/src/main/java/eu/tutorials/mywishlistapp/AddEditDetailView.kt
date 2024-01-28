@@ -75,7 +75,7 @@ fun AddEditDetailView(
                 if (viewModel.wishTitleState.isNotEmpty() && viewModel.wishDescriptionState.isNotEmpty()) {
                     // update wish
                 } else {
-
+                    // Show toast
                 }
 
             },
