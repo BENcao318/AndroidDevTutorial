@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
@@ -37,6 +40,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import eu.tutorials.musicappui.MainViewModel
 import eu.tutorials.musicappui.Screen
+import eu.tutorials.musicappui.screensInBottom
 import eu.tutorials.musicappui.screensInDrawer
 import eu.tutorials.musicappui.ui.theme.AccountDialog
 import eu.tutorials.musicappui.ui.theme.AccountView
@@ -47,7 +51,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainView(){
+fun MainView() {
 
     val scaffoldState: ScaffoldState = rememberScaffoldState()
     val scope: CoroutineScope = rememberCoroutineScope()
@@ -57,43 +61,67 @@ fun MainView(){
     val navBackStackEntry by controller.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val dialogOpen = remember{
+    val dialogOpen = remember {
         mutableStateOf(false)
     }
 
-    val currentScreen = remember{
+    val currentScreen = remember {
         viewModel.currentScreen.value
     }
 
-    val title = remember{
+    val title = remember {
         mutableStateOf(currentScreen.title)
+    }
+
+    val bottomBar: @Composable () -> Unit = {
+        if (currentScreen is Screen.DrawerScreen || currentScreen == Screen.BottomScreen.Home) {
+            BottomNavigation(Modifier.wrapContentSize()) {
+                screensInBottom.forEach { item ->
+                    BottomNavigationItem(
+                        selected = currentRoute == item.bRoute,
+                        onClick = { controller.navigate(item.bRoute) },
+                        icon = {
+                            Icon(
+                                contentDescription = item.bTitle,
+                                painter = painterResource(id = item.icon)
+                            )
+                        },
+                        label = { Text(text = item.bTitle) },
+                        selectedContentColor = Color.White,
+                        unselectedContentColor = Color.Black
+                    )
+                }
+            }
+        }
     }
 
 
     Scaffold(
+        bottomBar = bottomBar,
         topBar = {
             TopAppBar(title = { Text(title.value) },
-                navigationIcon = { IconButton(onClick = {
-                    // Open the drawer
-                    scope.launch {
-                        scaffoldState.drawerState.open()
+                navigationIcon = {
+                    IconButton(onClick = {
+                        // Open the drawer
+                        scope.launch {
+                            scaffoldState.drawerState.open()
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Menu")
                     }
-                }) {
-                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Menu" )
-                }}
+                }
             )
-        },scaffoldState = scaffoldState,
+        }, scaffoldState = scaffoldState,
         drawerContent = {
-            LazyColumn(Modifier.padding(16.dp)){
-                items(screensInDrawer){
-                        item ->
+            LazyColumn(Modifier.padding(16.dp)) {
+                items(screensInDrawer) { item ->
                     DrawerItem(selected = currentRoute == item.dRoute, item = item) {
                         scope.launch {
                             scaffoldState.drawerState.close()
                         }
-                        if(item.dRoute == "add_account"){
-                            dialogOpen.value= true
-                        }else{
+                        if (item.dRoute == "add_account") {
+                            dialogOpen.value = true
+                        } else {
                             controller.navigate(item.dRoute)
                             title.value = item.dTitle
                         }
@@ -115,8 +143,8 @@ fun MainView(){
 fun DrawerItem(
     selected: Boolean,
     item: Screen.DrawerScreen,
-    onDrawerItemClicked : () -> Unit
-){
+    onDrawerItemClicked: () -> Unit
+) {
     val background = if (selected) Color.DarkGray else Color.White
     Row(
         Modifier
@@ -140,15 +168,17 @@ fun DrawerItem(
 
 
 @Composable
-fun Navigation(navController: NavController, viewModel: MainViewModel, pd:PaddingValues){
+fun Navigation(navController: NavController, viewModel: MainViewModel, pd: PaddingValues) {
 
-    NavHost(navController = navController as NavHostController,
-        startDestination = Screen.DrawerScreen.Account.route, modifier = Modifier.padding(pd) ){
+    NavHost(
+        navController = navController as NavHostController,
+        startDestination = Screen.DrawerScreen.Account.route, modifier = Modifier.padding(pd)
+    ) {
 
-        composable(Screen.DrawerScreen.Account.route){
+        composable(Screen.DrawerScreen.Account.route) {
             AccountView()
         }
-        composable(Screen.DrawerScreen.Subscription.route){
+        composable(Screen.DrawerScreen.Subscription.route) {
             Subscription()
         }
     }
