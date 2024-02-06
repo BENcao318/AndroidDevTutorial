@@ -1,5 +1,6 @@
 package eu.tutorials.chatbot.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,9 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -22,29 +26,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import eu.tutorials.chatbot.viewmodel.AuthViewModel
+import eu.tutorials.chatbot.data.Result
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(
+fun LoginScreen(
     authViewModel: AuthViewModel,
-    onNavigateToLogin: () -> Unit
+    onNavigateToSignUp: () -> Unit,
+    onSignInSuccess:()->Unit
 ) {
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
+    var password by remember {
+        mutableStateOf("")
+    }
 
+    val result by authViewModel.authResult.observeAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    ){
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text(text = "Email") },
+            label = { Text("Email") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
@@ -52,46 +59,38 @@ fun SignUpScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text(text = "Password") },
+            label = { Text("Password") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
             visualTransformation = PasswordVisualTransformation()
         )
-        OutlinedTextField(
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text(text = "First Name") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
-        OutlinedTextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text(text = "Last Name") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
         Button(
             onClick = {
-                authViewModel.signUp(email, password, firstName, lastName)
-                email = ""
-                password = ""
-                firstName = ""
-                lastName = ""
+
+                authViewModel.login(email, password)
+                when (result) {
+                    is Result.Success->{
+                        onSignInSuccess()
+                    }
+                    is Result.Error ->{
+
+                    }
+
+                    else -> {
+
+                    }
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Text(text = "Sign Up")
+            Text("Login")
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Already have an account? Sign in.",
-            modifier = Modifier.clickable {
-                onNavigateToLogin()
-            })
+        Text("Don't have an account? Sign up.",
+            modifier = Modifier.clickable { onNavigateToSignUp() }
+        )
     }
 }

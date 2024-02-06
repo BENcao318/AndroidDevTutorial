@@ -9,7 +9,6 @@ class UserRepository(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
 ) {
-
     suspend fun signUp(
         email: String,
         password: String,
@@ -29,7 +28,6 @@ class UserRepository(
     suspend fun login(email: String, password: String): Result<Boolean> =
         try {
             auth.signInWithEmailAndPassword(email, password).await()
-            Log.d("log", "testing")
             Result.Success(true)
         } catch (e: Exception) {
             Result.Error(e)
