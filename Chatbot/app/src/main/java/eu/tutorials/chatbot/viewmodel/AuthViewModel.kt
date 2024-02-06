@@ -1,20 +1,24 @@
 package eu.tutorials.chatbot.viewmodel
 
+import eu.tutorials.chatbot.data.Result
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import eu.tutorials.chatbot.Injection
-import eu.tutorials.chatbot.data.Result
 import eu.tutorials.chatbot.data.UserRepository
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
-    private val userRepository: UserRepository = UserRepository(
-        FirebaseAuth.getInstance(),
-        Injection.instance()
-    )
+    private val userRepository: UserRepository
+
+    init {
+        userRepository = UserRepository(
+            FirebaseAuth.getInstance(),
+            Injection.instance()
+        )
+    }
 
     private val _authResult = MutableLiveData<Result<Boolean>>()
     val authResult: LiveData<Result<Boolean>> get() = _authResult
