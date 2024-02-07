@@ -34,7 +34,8 @@ import eu.tutorials.chatbot.viewmodel.RoomViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRoomListScreen(
-    roomViewModel: RoomViewModel = viewModel()
+    roomViewModel: RoomViewModel = viewModel(),
+    onJoinClicked: (Room) -> Unit
 ) {
     val rooms by roomViewModel.rooms.observeAsState(emptyList())
     var showDialog by remember { mutableStateOf(false) }
@@ -50,7 +51,7 @@ fun ChatRoomListScreen(
 
         LazyColumn {
             items(rooms) { room ->
-                RoomItem(room = room)
+                RoomItem(room = room, onJoinClicked = { onJoinClicked(room) })
             }
         }
 
@@ -106,12 +107,12 @@ fun ChatRoomListScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewChatRoomListScreen() {
-    ChatRoomListScreen()
+    ChatRoomListScreen(){}
 }
 
 
 @Composable
-fun RoomItem(room: Room) {
+fun RoomItem(room: Room, onJoinClicked: (Room) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -119,14 +120,14 @@ fun RoomItem(room: Room) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = room.name, fontSize = 16.sp, fontWeight = FontWeight.Normal)
-        OutlinedButton(onClick = { /*TODO*/ }) {
+        OutlinedButton(onClick = { onJoinClicked(room) }) {
             Text(text = "Join")
         }
     }
 }
 
-@Preview (showBackground = true)
+@Preview(showBackground = true)
 @Composable
 fun PreviewRoomItem() {
-    RoomItem(room = Room("id.com", "Name"))
+    RoomItem(room = Room("id.com", "Name")) {}
 }
