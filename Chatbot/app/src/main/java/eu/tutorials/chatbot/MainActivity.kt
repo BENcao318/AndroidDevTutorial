@@ -1,8 +1,10 @@
 package eu.tutorials.chatbot
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,6 +20,7 @@ import eu.tutorials.chatbot.screen.LoginScreen
 import eu.tutorials.chatbot.ui.theme.ChatbotTheme
 import eu.tutorials.chatbot.viewmodel.AuthViewModel
 import eu.tutorials.chatbot.screen.SignUpScreen
+import eu.tutorials.chatroomapp.screen.ChatScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
@@ -61,8 +65,15 @@ fun NavigationGraph(
                 navController.navigate(Screen.ChatRoomsScreen.route)
             }
         }
-        composable(Screen.ChatRoomsScreen.route){
-            ChatRoomListScreen()
+        composable(Screen.ChatRoomsScreen.route) {
+            ChatRoomListScreen {
+                navController.navigate("${Screen.ChatScreen.route}/${it.id}")
+            }
+        }
+        composable("${Screen.ChatScreen.route}/{roomId}") {
+            val roomId: String = it
+                .arguments?.getString("roomId") ?: ""
+            ChatScreen(roomId = roomId)
         }
     }
 }
