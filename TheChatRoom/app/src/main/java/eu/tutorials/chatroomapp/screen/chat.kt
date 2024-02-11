@@ -47,8 +47,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ChatScreen(
     roomId: String,
-    messageViewModel:
-    MessageViewModel = viewModel(),
+    messageViewModel: MessageViewModel = viewModel(),
 ) {
     val messages by messageViewModel.messages.observeAsState(emptyList())
     messageViewModel.setRoomId(roomId)
@@ -61,10 +60,12 @@ fun ChatScreen(
         // Display the chat messages
         LazyColumn(
             modifier = Modifier.weight(1f)
-        )  {
+        ) {
             items(messages) { message ->
-                ChatMessageItem(message =  message.copy(isSentByCurrentUser
-                = message.senderId == messageViewModel.currentUser.value?.email)
+                ChatMessageItem(
+                    message = message.copy(
+                        isSentByCurrentUser = message.senderId == messageViewModel.currentUser.value?.email
+                    )
                 )
             }
         }
@@ -85,16 +86,14 @@ fun ChatScreen(
                     .padding(8.dp)
             )
 
-            IconButton(
-                onClick = {
-                    // Send the message when the icon is clicked
-                    if (text.value.isNotEmpty()) {
-                        messageViewModel.sendMessage(text.value.trim())
-                        text.value = ""
-                    }
-                    messageViewModel.loadMessages()
+            IconButton(onClick = {
+                // Send the message when the icon is clicked
+                if (text.value.isNotEmpty()) {
+                    messageViewModel.sendMessage(text.value.trim())
+                    text.value = ""
                 }
-            ) {
+                messageViewModel.loadMessages()
+            }) {
                 Icon(imageVector = Icons.Default.Send, contentDescription = "Send")
             }
         }
@@ -125,24 +124,19 @@ fun ChatMessageItem(message: Message) {
                 .padding(8.dp)
         ) {
             Text(
-                text = message.text,
-                color = Color.White,
-                style = TextStyle(fontSize = 16.sp)
+                text = message.text, color = Color.White, style = TextStyle(fontSize = 16.sp)
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = message.senderFirstName,
-            style = TextStyle(
-                fontSize = 12.sp,
-                color = Color.Gray
+            text = message.senderFirstName, style = TextStyle(
+                fontSize = 12.sp, color = Color.Gray
             )
         )
         Text(
             text = formatTimestamp(message.timestamp), // Replace with actual timestamp logic
             style = TextStyle(
-                fontSize = 12.sp,
-                color = Color.Gray
+                fontSize = 12.sp, color = Color.Gray
             )
         )
     }
