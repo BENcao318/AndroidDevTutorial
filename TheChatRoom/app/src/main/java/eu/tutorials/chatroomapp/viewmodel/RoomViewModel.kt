@@ -26,7 +26,7 @@ class RoomViewModel : ViewModel() {
         }
     }
 
-     fun loadRooms() {
+     private fun loadRooms() {
         viewModelScope.launch {
             when (val result = roomRepository.getRooms()) {
                 is Success -> _rooms.value = result.data
